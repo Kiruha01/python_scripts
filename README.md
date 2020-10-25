@@ -61,6 +61,6 @@ requirements: `bs4, lxml` - BeautifulSoup4 - библиотека парсинг
 ## ver.py - Шифр Вермана
 Шифрует сообщение. `ver.py --help` для справки.
 
-requirements: `-`.
+requirements: `click`.
 
 > Windows and Linux 

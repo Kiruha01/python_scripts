@@ -19,3 +19,11 @@ requirements: `PyQt5`
 requirements: `pyautogui` - управление мышью и клавой через python
 
 > Windows and Linux
+
+## picture.py - Рисовашки!
+**Non-refactoring**
+Мой модуль для автоматического рисования картинок в Paint. Есть линии, кружочки, полукружочки, сердечки... Остальное можно посмотреть в [этом]() руководстве
+
+requirements: `pyautogui` - управление мышью и клавой через python
+
+> Windows and Linux

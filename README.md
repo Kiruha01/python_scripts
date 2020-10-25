@@ -56,3 +56,10 @@ requirements: `-`
 requirements: `bs4` - BeautifulSoup4 - библиотека парсинга html
 
 > Windows and Linux 
+
+## ver.py - Шифр Вермана
+Шифрует сообщение. `ver.py --help` для справки.
+
+requirements: `-`.
+
+> Windows and Linux 

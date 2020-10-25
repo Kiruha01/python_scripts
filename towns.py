@@ -1,53 +1,69 @@
 import requests
-from bs4 import BeautifulSoup 
-import re
+import sys
+from bs4 import BeautifulSoup
+
+
+def removeExtraLetters(word: str) -> str:
+    new_word = word
+    while new_word[-1] == 'ь' or new_word[-1] == 'ъ' or new_word[-1] == 'ы' or new_word[-1] == 'й':
+        new_word = new_word[:-1]
+    return new_word
+
 
 r = requests.get('https://ru.wikipedia.org/wiki/Список_городов_России')
 soup = BeautifulSoup(r.content, features="lxml")
 
-tables = soup.find('table', 'standard sortable').tbody.contents[2:]
-towns=[]
-for town in tables:
-	towns.append(town.contents[2].a.string)
-word = input('>').capitalize()
+townRaw = soup.find('table', 'standard sortable').tbody.contents[2:]
+townsOfRussia = []
+for town in townRaw:
+    town = town.contents[2].a.string.lower()
+    # delete "-"
+    town.replace("-", " ")
+    townsOfRussia.append(town)
 
-towns.remove(word)
+if len(sys.argv) > 1:
+    if sys.argv[1] == '-f':
+        # filemod
+        word = input('>').capitalize()
+        townsOfRussia.remove(word)
 
+        f = open('Игра в города {0}.txt'.format(word), 'w')
+        print(word, file=f)
 
-# while True:
-# 	print()
-# 	ans = input('> ').capitalize()
-# 	if ans in towns and word[-1] == ans[0].lower():
-# 		towns.remove(ans)
-# 	else:
-# 		print('!!!!')
-# 		continue
-# 	while ans[-1] == 'ь' or ans[-1] == 'ъ' or ans[-1] == 'ы' or ans[-1] == 'й':
-# 		ans = ans[:-1]
-# 	for i in towns:
-# 		if i[0].lower() == ans[-1]:
-# 			towns.remove(i)
-# 			print(i)
-# 			word = i
-# 			break
-# 	while word[-1] == 'ь' or word[-1] == 'ъ' or word[-1] == 'ы' or word[-1] == 'й':
-# 		word = word[:-1]
+        while True:
+            word = removeExtraLetters(word) # remove Ь Ъ Ы Й
+            for newTown in townsOfRussia:
+                if newTown[0] == word[-1]:
+                    townsOfRussia.remove(newTown)
+                    print(newTown.capitalize(), file=f)
+                    word = newTown
+                    break
+            else:  # if don't break
+                break
+        f.close()
 
+    elif sys.argv[1] != '-i':
+        print("Error! Invalid param.")
+        exit(1)
+else:
+    newTown = None
+    while True:
+        ans = input('> ').lower()
+        if ans not in townsOfRussia:
+            print("Town have to exist!")
+            continue
 
-# =============================
+        if newTown and newTown[-1] != ans[0]:
+            print("Follow the riles!")
+            continue
+        ans = removeExtraLetters(ans)
 
-
-f = open('Игра в города {0}.txt'.format(word), 'w')
-print(word, file=f)
-while True:
-	for i in towns:
-		if i[0].lower() == word[-1]:
-			towns.remove(i)
-			print(i, file=f)
-			word = i
-			break
-	else:
-		break
-	while word[-1] == 'ь' or word[-1] == 'ъ' or word[-1] == 'ы' or word[-1] == 'й':
-		word = word[:-1]
-f.close()
+        for newTown in townsOfRussia:
+            if newTown[0] == ans[-1]:
+                townsOfRussia.remove(newTown)
+                print(newTown.capitalize())
+                break
+        else:
+            print("You win!")
+            exit(0)
+        newTown = removeExtraLetters(newTown)

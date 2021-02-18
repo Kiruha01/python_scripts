@@ -1,32 +1,44 @@
 from random import shuffle, randint
 from time import sleep
 from colorama import init, Fore, Back, Style
-from termcolor import colored
 import os
 
 init()
 
 
 class Card(object):
-    """docstring for card"""
-    def __init__(self, mast, card, value):
-        self.mast = mast
-        self.card = card
-        self.color = 'black' if mast in ('♣', '♠') else 'red'
+    trump = None
+    """Playing card.
+    Suits:
+        - '♣'
+        - '♠'
+        - '♦'
+        - '♥'
+        
+    defs:
+        compare(card)
+        get()        
+            """
+
+    def __init__(self, suit: str, letter: str, value: int):
+        self.suit = suit
+        self.letter = letter
+        self.color = 'black' if suit in ('♣', '♠') else 'red'
         self.value = value
 
-    def compare(self, card):      # Может ли эта карта побить карту "card"
-        if (self.value > card.value) and (self.mast == card.mast or self.mast == kozyr):
+    def compare(self, card: "Card") -> bool:
+        """Может ли эта карта побить карту 'card'"""
+        if (self.value > card.value) and (self.suit == card.suit or self.suit == self.trump):
             return True
         return False
 
-    def get(self):
-        return self.card + self.mast
+    def __get__(self):
+        return self.letter + self.suit
 
     def __str__(self):
         if self.color == 'black':
-            return Fore.BLACK + Back.WHITE + self.get() + Style.RESET_ALL
-        return Fore.RED + Back.WHITE + self.get() + Style.RESET_ALL
+            return Fore.BLACK + Back.WHITE + self.__get__() + Style.RESET_ALL
+        return Fore.RED + Back.WHITE + self.__get__() + Style.RESET_ALL
         
 
 class Player(object):
@@ -44,8 +56,8 @@ class Player(object):
         return False # Незьзя
 
     def throw(self, list_of_cards, index_of_my_card):
-        masts = [i.card for i in list_of_cards]
-        if self.card[index_of_my_card].card in masts:
+        masts = [i.letter for i in list_of_cards]
+        if self.card[index_of_my_card].letter in masts:
             return self.go(index_of_my_card)
         return False # Нельзя
 
@@ -81,7 +93,7 @@ class Player(object):
                 return False # Нечем, если цикл прошёл без успешно
             else:                                                   # Иначе
                 for index, _card_ in enumerate(self.card):
-                    if (_card_.mast == events[-1].mast) or _card_.mast == kozyr:
+                    if (_card_.suit == events[-1].suit) or _card_.suit == trump:
                         card = self.beat(index, events[-1])         # Бъём
                         if card:
                             return card
@@ -144,7 +156,7 @@ def go_for_real_person(self, events):
         if hod == 0:
             return 1
         hod -= 1
-        if hod > len(self.card):
+        if hod > len(self.letter):
             print('No no no no no')
             continue
         break
@@ -156,12 +168,12 @@ mast = ['♦', '♣', '♠', '♥']
 card = ['6', '7', '8', '9', '10', 'J', 'Q', 'К', 'Т']
 
         
-kozyr = mast[randint(0, 3)]
+Card.trump = mast[randint(0, 3)]
 
 coloda = []
 for _mast_ in mast:
     for value, _card_ in enumerate(card):
-        if _mast_ == kozyr:
+        if _mast_ == Card.trump:
             coloda.append(Card(_mast_, _card_, value+len(card)))
         else:
             coloda.append(Card(_mast_, _card_, value))
@@ -195,16 +207,16 @@ while win: # Основной цикл
 
     while True:
         if players[0].get() == 0:
-            blit(kozyr, players[0].card, players[1].card, events)
+            blit(Card.trump, players[0].card, players[1].card, events)
             print('----Human-Win------')
             win = False
             break
         if players[1].get() == 0:
-            blit(kozyr, players[0].card, players[1].card, events)
+            blit(Card.trump, players[0].card, players[1].card, events)
             print('-----Bot-Win-------')
             win = False
             break
-        blit(kozyr, players[0].card, players[1].card, events)
+        blit(Card.trump, players[0].card, players[1].card, events)
         if i % 2 == 0:  # Если человек
             answer = go_for_real_person(players[i % 2], events)
             if answer:
